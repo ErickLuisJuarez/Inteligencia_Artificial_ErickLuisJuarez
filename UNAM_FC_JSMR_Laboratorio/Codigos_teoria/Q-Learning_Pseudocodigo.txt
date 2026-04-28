@@ -1,0 +1,91 @@
+Algoritmo Q-LEARNING
+
+Entrada:
+ estados
+ acciones
+ alpha
+ gamma
+ epsilon
+
+Inicializar Q(s,a)=0
+
+Para episodio <- 1 hasta N hacer
+
+   estado <- estado inicial
+
+   Mientras estado no terminal hacer
+
+      Si random < epsilon entonces
+
+         accion <- aleatoria
+
+      Si no
+
+         accion <- argmax(Q[estado])
+
+      Fin Si
+
+
+      ejecutar accion
+
+      observar recompensa
+
+      observar proximo_estado
+
+
+      q_actual <- Q[estado,accion]
+
+      mejor_q <- max(Q[proximo_estado])
+
+      Q[estado,accion] <-
+         q_actual +
+         alpha(
+         recompensa
+         + gamma*mejor_q
+         - q_actual
+         )
+
+
+      estado <- proximo_estado
+
+   Fin Mientras
+
+Fin Para
+
+Complejidad temporal:
+
+O(E*T*A)
+
+Complejidad espacial:
+
+O(S*A)
+
+donde:
+
+E = episodios
+T = pasos por episodio
+A = acciones
+S = estados
+
+DEFINICIÓN:
+Algoritmo de control de Aprendizaje por Refuerzo que aprende la
+función Q(s, a), representando la "calidad" de tomar la acción a
+en el estado s. Aprende por ensayo y error en un entorno.
+
+FUNDAMENTOS MATEMATICOS
+
+Función Q(s, a):
+  Representa la "calidad" de tomar la acción a en el estado s.
+ 
+Ecuación de Bellman:
+  Q(s, a) ← Q(s, a) + α [ R + γ · max_{a'} Q(s', a') - Q(s, a) ]
+ 
+  Donde:
+  - α   → tasa de aprendizaje (learning rate)
+  - γ   → factor de descuento (cuánto importa el futuro; 0 ≤ γ ≤ 1)
+  - R   → recompensa recibida
+  - s'  → siguiente estado
+  - a'  → mejor acción en el siguiente estado
+ 
+  El objetivo del agente es maximizar la recompensa total acumulada a largo plazo.
+ 

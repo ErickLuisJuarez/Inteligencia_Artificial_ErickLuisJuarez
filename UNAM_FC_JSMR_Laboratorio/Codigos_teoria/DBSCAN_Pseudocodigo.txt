@@ -1,0 +1,49 @@
+DBSCAN
+----------------------------------------------------------------
+Algoritmo: DBSCAN
+Entrada: Dataset X, ε (radio de vecindad), MinPts (mínimo de vecinos)
+ 
+1. Etiquetar todos los puntos como NO VISITADOS
+2. Para cada punto P en X:
+     a. Si P ya fue visitado, continuar al siguiente
+     b. Marcar P como VISITADO
+     c. Buscar vecinos de P a distancia ε
+     d. Si cantidad de vecinos < MinPts:
+           → Marcar P como RUIDO
+     e. Sino:
+           → Crear un nuevo Cluster C y añadir P
+           → EXPANDIR Cluster:
+               Para cada vecino P' de P:
+                 - Si P' no ha sido visitado: marcar como VISITADO
+                 - Si P' tiene suficientes vecinos, añadir sus propios
+                   vecinos a la lista de búsqueda
+                 - Añadir P' al Cluster C
+
+COMPLEJIDAD EN TIEMPO:
+  - Promedio: O(n · log(n))  → con estructuras espaciales (KD-Trees)
+  - Peor caso: O(n²)  → si se calcula la matriz de distancias completa
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(n)  → para almacenar las etiquetas y los datos
+ 
+VENTAJA: No necesita especificar K a priori.
+
+DEFINICIÓN:
+Density-Based Spatial Clustering of Applications with Noise.
+No necesita especificar K a priori y puede encontrar grupos de
+formas arbitrarias (lunas, anillos). Detecta ruido (outliers),
+algo que K-means no puede hacer.
+
+FUNDAMENTOS MATEMATICOS
+Dado dataset D y parámetros ε (epsilon) y MinPts:
+ 
+  - Vecindad:     N_ε(p) = { q ∈ D | dist(p, q) ≤ ε }
+  - Core Point:   |N_ε(p)| ≥ MinPts
+  - Alcanzable por densidad: q alcanzable desde p si existe
+    cadena p₁, …, pₙ donde p₁=p, pₙ=q y cada pᵢ₊₁ es
+    directamente alcanzable desde pᵢ
+  - Cluster:      conjunto máximo de puntos alcanzables por densidad
+ 
+Parámetros:
+  - ε (Epsilon):  radio de vecindad
+  - MinPts:       masa crítica para región densa  (regla: MinPts ≥ d + 1)

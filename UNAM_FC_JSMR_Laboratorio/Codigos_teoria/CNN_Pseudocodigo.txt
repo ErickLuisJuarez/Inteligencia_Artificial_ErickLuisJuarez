@@ -1,0 +1,77 @@
+Algoritmo CNN
+
+Entrada:
+  Imagen
+  Filtros
+  Pesos
+  Biases
+
+Proceso:
+
+1. Convolución
+
+Para cada región de la imagen hacer
+
+   Para cada filtro f hacer
+
+      mapa[i,j,f] <- SUM(region * filtro[f])
+
+   Fin Para
+
+Fin Para
+
+
+2. Max Pooling
+
+Para cada región pooling hacer
+
+   salida_pool[i,j] <- máximo(región)
+
+Fin Para
+
+
+3. Softmax
+
+aplanar <- convertir salida_pool en vector
+
+z <- aplanar * pesos + biases
+
+probabilidades <- exp(z) / SUM(exp(z))
+
+
+4. Clasificación
+
+clase <- argmax(probabilidades)
+
+Salida:
+ clase predicha
+ probabilidades
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(capas · filtros · tamaño_imagen · kernel²)
+      (intensivo en cómputo → se usan GPUs)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(parámetros)
+      (eficientes por weight sharing: los filtros se comparten en toda la imagen)
+
+DEFINICIÓN (Red Neuronal Artificial):
+Modelo de IA inspirado en cómo funciona el cerebro humano. Aprende
+a partir de ejemplos para tomar decisiones o hacer predicciones.
+Está formada por neuronas artificiales conectadas que procesan
+información numérica.
+
+FUNDAMENTOS MATEEMATICOS
+
+Operación de Convolución:
+  (X * K)ᵢ,ⱼ = ΣΣ  X_{i+p, j+q} · K_{p,q}
+ 
+  Donde K = filtro/kernel de tamaño m×n.
+ 
+Función de Activación ReLU:
+  f(x) = max(0, x)
+ 
+Pooling:
+  Se toma el máximo o promedio en una vecindad de k×k para reducir dimensionalidad.
+
+

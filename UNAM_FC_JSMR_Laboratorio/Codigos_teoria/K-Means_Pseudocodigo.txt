@@ -1,0 +1,41 @@
+K-MEANS
+----------------------------------------------------------------
+Algoritmo: K-means Clustering
+Entrada: Dataset X, número de clusters K
+Salida:  K centroides y etiquetas de pertenencia de cada punto
+ 
+1. Inicializar K centroides aleatoriamente (pueden ser puntos del dataset)
+2. Repetir hasta que no haya cambios (o se alcance un máximo de iteraciones):
+     a. Paso de ASIGNACIÓN:
+           Para cada punto xi, encontrar el centroide μj más cercano
+           y asignarlo al clúster Cj
+     b. Paso de ACTUALIZACIÓN:
+           Para cada clúster Cj, calcular el nuevo centroide μj
+           como el promedio de todos los puntos asignados a él:
+               μj = (1/|Cj|) · Σ xi   (para xi ∈ Cj)
+3. Salida: Los K centroides y las etiquetas de pertenencia de cada punto
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(I · K · n · d)
+      donde I = iteraciones hasta convergencia, K = número de clusters,
+              n = muestras, d = características
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O((n + K) · d)
+      (datos originales + coordenadas de los K centroides)
+ 
+
+DEFINICIÓN:
+Algoritmo de aprendizaje no supervisado. Agrupa datos no etiquetados
+en K grupos (clusters) basándose en la similitud de características.
+Minimiza la Inercia (suma de cuadrados dentro del cluster - WCSS).
+
+FUNDAMENTOS MATEMATICOS
+Función objetivo — Inercia (WCSS — Within-Cluster Sum of Squares):
+  J = Σⱼ₌₁ᴷ  Σ_{xᵢ ∈ Cⱼ}  ||xᵢ - μⱼ||²
+ 
+Distancia Euclidiana:
+  d(x, μ) = √( Σ (xᵢ - μᵢ)² )
+ 
+Actualización del centroide:
+  μⱼ = (1/|Cⱼ|) Σ_{xᵢ ∈ Cⱼ} xᵢ

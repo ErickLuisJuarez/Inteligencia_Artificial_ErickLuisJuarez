@@ -1,0 +1,54 @@
+ÁRBOL DE DECISIÓN (ID3 / CART)
+----------------------------------------------------------------
+Algoritmo: Construcción de Árbol de Decisión
+Entrada: Dataset D (características y etiquetas)
+ 
+1. Si todos los ejemplos en D son de la misma clase:
+     → Retornar un nodo hoja con esa etiqueta
+2. Si no hay más características para dividir:
+     → Retornar un nodo hoja con la clase mayoritaria
+3. Sino:
+     a. Calcular la Ganancia de Información para cada característica disponible
+     b. Elegir la característica A con la mayor ganancia
+     c. Crear un Nodo de Decisión basado en A
+     d. Para cada valor posible de A, crear una rama y repetir
+        el proceso recursivamente con el subconjunto de datos resultante
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(n · d · log(n))
+      (evalúa cada característica en cada nivel para encontrar el mejor corte)
+  - Predicción: O(profundidad del árbol) ≈ O(log(n))
+      (extremadamente rápido en producción)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(nodos)  → solo se guardan las reglas de decisión, no los datos originales
+
+DEFINICIÓN:
+Modelo de aprendizaje supervisado estructurado como un grafo
+acíclico dirigido (árbol). Clasifica o predice mediante una
+estructura jerárquica de preguntas y respuestas lógicas.
+
+FUNDAMENTOS MATEMATICOS:
+
+Entropía H(S):
+  H(S) = - Σᵢ₌₁ᶜ pᵢ · log₂(pᵢ)
+ 
+  Donde:
+  - c  = número de clases
+  - pᵢ = proporción de instancias de la clase i
+  - log₂ expresa la información en bits
+ 
+  Interpretación:
+  - H(S) = 0   → nodo puro (baja incertidumbre)
+  - H(S) alta  → clases mezcladas (alta incertidumbre)
+ 
+Ganancia de Información IG(S, A):
+  IG(S, A) = H(S) - Σ_{v ∈ Values(A)}  (|Sᵥ|/|S|) · H(Sᵥ)
+ 
+  Donde:
+  - A    = atributo o característica
+  - Sᵥ   = subconjunto de S donde A = v
+  - El árbol elige el atributo A que MAXIMIZA IG
+ 
+Índice Gini (alternativa a la entropía, usado en CART):
+  Gini(S) = 1 - Σᵢ pᵢ²

@@ -1,0 +1,43 @@
+K-NEAREST NEIGHBORS (k-NN - Fuerza Bruta)
+----------------------------------------------------------------
+Algoritmo: k-Nearest Neighbors (k-NN)
+Entrada: Dataset de entrenamiento (X, y), nuevo punto xtest, parámetro k
+Salida:  Clase predicha para xtest
+ 
+1. Para cada ejemplo (xi, yi) en el dataset de entrenamiento:
+     a. Calcular la distancia di entre xtest y xi (ej. Euclideana)
+     b. Almacenar la distancia di junto con su etiqueta yi en una lista
+2. Ordenar la lista de distancias de menor a mayor
+3. Seleccionar los primeros k elementos de la lista ordenada
+4. Contar la frecuencia de cada etiqueta entre esos k vecinos
+5. Retornar la etiqueta con la frecuencia más alta (voto mayoritario)
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(1)  → no hay fase de optimización; solo se
+                            almacenan los datos
+  - Predicción (fuerza bruta): O(n · d)
+      (para cada consulta, calcula distancia contra n ejemplos de d dimensiones)
+  - Predicción (con KD-Trees o Ball Trees): O(d · log(n))
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(n · d)  → todo el dataset debe permanecer en memoria RAM
+
+DEFINICIÓN:
+Algoritmo de clasificación supervisado no paramétrico. No asume
+una distribución predefinida para los datos. En lugar de generar
+un modelo, memoriza las instancias de entrenamiento.
+
+FUNDAMENTOS MATEMATICOS
+
+Función de Distancia Euclidiana (ℝᵈ):
+  d(x, y) = √( Σᵢ₌₁ⁿ (xᵢ - yᵢ)² )
+ 
+  Alternativas: Distancia Manhattan, Similitud de Coseno
+  (para datos categóricos o de alta dimensionalidad)
+ 
+Regla de Decisión (voto mayoritario):
+  ŷ = argmax_v  Σ_{xᵢ ∈ N_k(x')}  I(yᵢ = v)
+ 
+  Donde:
+  - N_k(x') = conjunto de los k puntos más cercanos a x'
+  - I(·)    = función indicadora (1 si condición verdadera, 0 si no)

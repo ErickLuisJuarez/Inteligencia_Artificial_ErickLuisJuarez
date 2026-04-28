@@ -1,0 +1,62 @@
+SUPPORT VECTOR MACHINE (SVM - Hinge Loss / Descenso de Gradiente)
+----------------------------------------------------------------
+Algoritmo: SVM (Hard Margin / Linear)
+Entrada: X, y (etiquetas -1 o 1), alpha, lambda (regularización)
+Salida:  w, b
+ 
+1. Inicializar w = 0, b = 0
+2. Para cada iteración/época:
+     Para cada ejemplo xi:
+       Si yi * (w · xi - b) >= 1:
+         # El punto está fuera del margen → solo regularización
+         dw = 2 * lambda * w
+         db = 0
+       Sino:
+         # El punto es vector de soporte o está mal clasificado
+         dw = 2 * lambda * w - (xi * yi)
+         db = yi
+       Actualizar pesos y sesgo:
+         w = w - alpha * dw
+         b = b - alpha * db
+
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: Típicamente entre O(n² · d) y O(n³ · d)
+      (hace que las SVM sean lentas con conjuntos de datos muy grandes)
+  - Predicción: O(v · d)
+      donde v = número de vectores de soporte
+      (muy eficiente una vez entrenado)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(n²) en la implementación básica
+      (necesita almacenar la matriz de similitudes - kernel)
+
+
+DEFINICIÓN (SVM):
+Clasificador discriminatorio definido formalmente por un hiperplano
+de separación. Busca el hiperplano óptimo que maximiza el margen
+entre clases.
+
+FUNDAMENTOS MATEMATICOS
+Función de decisión:
+  f(x) = sign(ωᵀ x + b)
+ 
+Hiperplano separador:
+  ω · x + b = 0
+  Donde ω = vector normal al hiperplano, b = sesgo (bias).
+ 
+Problema de optimización (Margen Duro):
+  minimizar:  (1/2) ||ω||²
+  sujeto a:   yᵢ(ω · xᵢ + b) ≥ 1   para todo i = 1, …, n
+ 
+Formulación Dual (Multiplicadores de Lagrange):
+  maximizar:  Σᵢαᵢ - ΣᵢΣⱼ αᵢαⱼ yᵢyⱼ (xᵢ · xⱼ)
+  sujeto a:   αᵢ ≥ 0   y   Σ αᵢyᵢ = 0
+ 
+Kernel Trick (permite datos no linealmente separables):
+  - Lineal:           K(x, z) = x · z
+  - RBF (Gaussiano):  K(x, z) = exp(−γ |x − z|²)
+ 
+Margen Blando (datos con ruido):
+  Se introduce la variable de holgura ξ y parámetro C:
+  minimizar:  (1/2)||ω||² + C Σ ξᵢ

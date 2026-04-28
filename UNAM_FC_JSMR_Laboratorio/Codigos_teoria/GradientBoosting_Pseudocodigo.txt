@@ -1,0 +1,44 @@
+GRADIENT BOOSTING
+----------------------------------------------------------------
+Algoritmo: Gradient Boosting (Regresión / Clasificación)
+Entrada: Dataset D, Función de pérdida L, Número de iteraciones M,
+         Tasa de aprendizaje η
+Salida:  Modelo final FM(x)
+ 
+1. Inicializar el modelo con una constante:
+       F0(x) = argmin_γ Σ L(yi, γ)
+2. Para m = 1 hasta M:
+     a. Calcular los residuos rim para cada ejemplo del dataset
+     b. Entrenar un árbol de decisión hm(x) usando los residuos
+        rim como el nuevo "objetivo" (target)
+     c. Actualizar el modelo sumando una fracción del nuevo árbol:
+           Fm(x) = Fm-1(x) + η · hm(x)
+3. Salida: El modelo final FM(x)
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(M · n · d · log(n))
+      donde M = número de iteraciones (árboles)
+      (NO es fácilmente paralelizable porque cada árbol depende del anterior)
+  - Predicción: O(M · profundidad del árbol)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(M · nodos)  → se almacena la secuencia completa de árboles
+
+DEFINICIÓN:
+Técnica de Ensemble Learning secuencial. Cada árbol sucesivo no
+predice el resultado real, sino que intenta corregir los errores
+(residuos) del árbol anterior. Proceso de mejora continua en cascada.
+
+FUNDAMENTOS MATEMATICOS
+Gradient Boosting — Modelo Aditivo:
+  F_M(x) = Σₘ₌₁ᴹ  γₘ · hₘ(x)
+ 
+  Donde hₘ(x) son los árboles (weak learners) y γₘ el peso de cada uno.
+ 
+Pseudo-residuos (gradiente negativo de la pérdida):
+  rᵢₘ = - (∂L(yᵢ, F(xᵢ))) / (∂F(xᵢ))  evaluado en F(x) = F_{m-1}(x)
+ 
+Actualización del modelo:
+  F_m(x) = F_{m-1}(x) + η · hₘ(x)
+ 
+  Donde η = tasa de aprendizaje (shrinkage).

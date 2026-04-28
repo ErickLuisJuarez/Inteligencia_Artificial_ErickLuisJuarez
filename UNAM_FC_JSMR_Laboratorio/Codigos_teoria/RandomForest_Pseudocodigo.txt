@@ -1,0 +1,41 @@
+RANDOM FOREST
+----------------------------------------------------------------
+Algoritmo: Random Forest
+Entrada: Dataset D, número de árboles B, subconjunto de características m
+ 
+1. Para b = 1 hasta B:
+     a. Crear una muestra Bootstrap Db de los datos originales
+     b. Entrenar un árbol Tb usando Db
+     c. En cada división del árbol, seleccionar solo m características
+        al azar de las d disponibles
+     d. Elegir el mejor corte entre esas m características
+2. Para predecir un dato nuevo:
+     a. Pasar el dato por los B árboles
+     b. Realizar la votación y devolver la clase más frecuente
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(B · n · d · log(n))
+      donde B = número de árboles
+      (los árboles son independientes → se puede paralelizar fácilmente)
+  - Predicción: O(B · profundidad del árbol)
+      (B veces más lento que un solo árbol, pero sigue siendo rápido)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(B · nodos)  → necesita guardar todos los árboles en memoria
+
+DEFINICIÓN:
+Modelo de Ensemble Learning (Aprendizaje de Conjunto) que combina
+múltiples árboles de decisión. Aplica el principio de reducción de
+varianza mediante Bagging y selección aleatoria de características.
+
+FUNDAMENTOS MATEMATICOS
+
+Bootstrapping:
+  Dado dataset D de tamaño N, crear B muestras aleatorias D_b
+  con muestreo con reemplazo (algunos datos se repiten).
+ 
+Clasificador de Bosque (voto mayoritario):
+  ŷ = mode{ T₁(x), T₂(x), …, T_B(x) }
+ 
+  Donde T₁ … T_B son los árboles entrenados.
+

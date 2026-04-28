@@ -1,0 +1,37 @@
+HIERARCHICAL CLUSTERING AGLOMERATIVO (HAC)
+----------------------------------------------------------------
+Algoritmo: Hierarchical Agglomerative Clustering (HAC)
+Entrada: Dataset X, métrica de distancia, criterio de enlace
+ 
+1. Inicializar cada xi como un cluster Ci
+2. Calcular la matriz de distancias D entre todos los clusters
+3. Mientras número de clusters > 1:
+     a. Buscar (Ci, Cj) tales que dist(Ci, Cj) sea mínima
+     b. Combinar Ci y Cj en C_union
+     c. Actualizar D usando el criterio de enlace
+        (ej. Ward, Average, Single, Complete)
+     d. Registrar la fusión y la distancia para el dendrograma
+4. Salida: Historia de fusiones (Z-matrix)
+ 
+
+COMPLEJIDAD EN TIEMPO:
+  - Básica: O(n³)
+  - Versiones optimizadas: O(n² · log(n))
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(n²)  → necesita almacenar la matriz de distancias completa
+              entre todos los pares de puntos
+ 
+
+DEFINICIÓN:
+Algoritmo no supervisado que revela la estructura de parentesco
+entre datos mediante un dendrograma. Existen dos tipos:
+  - Aglomerativo (bottom-up): de individual a global (el más común)
+  - Divisivo (top-down): de global a individual
+
+FUNDAMENTOS MATEMATICOS
+Criterios de Enlace (linkage):
+  - Single Linkage:   dist(A,B) = min(dist(a,b))  para a∈A, b∈B
+  - Complete Linkage: dist(A,B) = max(dist(a,b))
+  - Average Linkage:  dist(A,B) = promedio de todas las distancias entre pares
+  - Ward's Method:    minimiza el aumento de varianza intra-cluster al fusionar

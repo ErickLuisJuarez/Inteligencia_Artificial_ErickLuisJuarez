@@ -1,0 +1,52 @@
+ISOLATION FOREST
+----------------------------------------------------------------
+Algoritmo: Isolation Forest (iForest)
+Entrada: Dataset X, número de árboles t, tamaño de submuestra ψ
+ 
+1. Para i = 1 hasta t:
+     a. Tomar una submuestra X' de tamaño ψ
+     b. Construir un iTree:
+           - Seleccionar una característica q al azar
+           - Seleccionar un valor de corte p al azar
+             entre el min y max de q
+           - Dividir los datos en X_izq y X_der
+           - Repetir recursivamente hasta que el nodo tenga
+             un solo punto o se alcance el límite de altura
+2. Para cada punto nuevo x:
+     a. Calcular la longitud del camino h(x) en cada uno de los t árboles
+     b. Calcular el Anomaly Score:
+           s(x, ψ) = 2^(-E(h(x)) / c(ψ))
+        Interpretación:
+           - s → 1.0 : es definitivamente una anomalía
+           - s << 0.5 : es un punto normal
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(t · ψ · log(ψ))
+      donde t = número de árboles, ψ = tamaño de la submuestra
+      (no procesa todo el dataset por árbol → muy eficiente)
+  - Predicción: O(t · log(ψ))
+      (ideal para sistemas de fraude en tiempo real)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(t · ψ)  → muy baja ocupación de memoria comparado con métodos
+                 basados en distancias como KNN
+
+DEFINICIÓN:
+Algoritmo no supervisado para detectar anomalías/outliers en
+grandes conjuntos de datos. A diferencia de otros métodos que
+perfilan puntos normales, aísla observaciones atípicas construyendo
+árboles aleatorios.
+
+actor de Normalización c(n):
+  c(n) = 2H(n-1) - 2(n-1)/n
+ 
+  Donde H(i) = número armónico = ln(i) + 0.5772156649 (constante de Euler-Mascheroni)
+ 
+Puntaje de Anomalía s(x, n):
+  s(x, n) = 2^( -E(h(x)) / c(n) )
+ 
+  Donde E(h(x)) = valor esperado de la longitud del camino h(x) en el bosque.
+ 
+Interpretación:
+  - s → 1     → definitivamente una anomalía
+  - s << 0.5  → punto normal

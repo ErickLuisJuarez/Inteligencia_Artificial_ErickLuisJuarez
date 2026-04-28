@@ -1,0 +1,48 @@
+XGBOOST (A nivel de nodo)
+----------------------------------------------------------------
+Algoritmo: XGBoost (Nivel de Nodo)
+Entrada: Residuos de la iteración anterior, Gradientes gi y Hessianos hi
+ 
+Para cada posible división (split) en una característica:
+1. Calcular la "Ganancia de Estructura" (Score):
+       Gain = (1/2) * [ (ΣgL)²/(ΣhL + λ) + (ΣgR)²/(ΣhR + λ)
+                        - (Σ(gL+gR))²/(Σ(hL+hR) + λ) ] - λ
+2. Elegir la división que maximice el Gain
+3. Si el Gain máximo < 0, no se divide el nodo (poda - pruning)
+4. Asignar el peso óptimo a la hoja:
+       ω* = -Σgi / (Σhi + λ)
+
+COMPLEJIDAD EN TIEMPO:
+  - Entrenamiento: O(M · d · n·log(n))
+      (gracias a block structures y cómputo fuera de memoria, es
+       drásticamente más veloz que el GBM estándar)
+  - Predicción: O(M · profundidad del árbol)
+ 
+COMPLEJIDAD EN ESPACIO:
+  - O(M · nodos) + O(n · d)
+      (espacio para la estructura de los árboles más los índices
+       de las características ordenadas - histogramas)
+
+
+DEFINICIÓN:
+Implementación optimizada y regularizada del Gradient Boosting.
+Se volvió famosa por ganar casi todas las competencias de Kaggle
+
+FUNDAMENTOS MATEMATICOS
+Función Objetivo con Regularización:
+  Obj(φ) = Σᵢ L(yᵢ, ŷᵢ) + Σₖ Ω(fₖ)
+ 
+Regularización Ω(f):
+  Ω(f) = γT + (1/2)λ||ω||²
+ 
+  Donde T = número de hojas, ω = pesos de las hojas.
+ 
+Aproximación de Taylor (2° orden):
+  XGBoost usa gradiente gᵢ (1ª derivada) y hessiano hᵢ (2ª derivada)
+  para aproximar la función de pérdida más rápido.
+ 
+Ganancia de Estructura (Score) de una división:
+  Gain = (1/2) [ (Σg_L)²/(Σh_L + λ)  +  (Σg_R)²/(Σh_R + λ)  -  (Σg_L+g_R)²/(Σh_L+h_R + λ) ] - γ
+ 
+Peso óptimo de la hoja:
+  ω* = - (Σgᵢ) / (Σhᵢ + λ)
