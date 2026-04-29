@@ -1,51 +1,71 @@
-Algoritmo CNN
+PSEUDOCÓDIGO — Red Neuronal Convolucional (CNN) Didáctica
+=========================================================
 
-Entrada:
-  Imagen
-  Filtros
-  Pesos
-  Biases
+═══════════════════════════════════════
+ CLASE: CapaConvolución
+═══════════════════════════════════════
 
-Proceso:
+INICIALIZAR(num_filtros, tamaño_kernel):
+    filtros ← valores aleatorios normalizados
+               de forma (num_filtros, tamaño_kernel, tamaño_kernel)
+               divididos entre (tamaño_kernel²) para estabilizar
 
-1. Convolución
+OBTENER_REGIONES(imagen):
+    h, w ← dimensiones de la imagen
+    Para i desde 0 hasta (h - tamaño_kernel):
+        Para j desde 0 hasta (w - tamaño_kernel):
+            region ← imagen[i : i+tamaño_kernel, j : j+tamaño_kernel]
+            Ceder (region, i, j)
 
-Para cada región de la imagen hacer
+FORWARD(entrada):
+    Guardar entrada como última_entrada
+    h, w ← dimensiones de entrada
+    salida ← zeros(h - tamaño_kernel + 1,
+                   w - tamaño_kernel + 1,
+                   num_filtros)
 
-   Para cada filtro f hacer
+    Para cada (region, i, j) en OBTENER_REGIONES(entrada):
+        salida[i, j] ← suma del producto_punto(region, filtros)
+                        a lo largo de los ejes 1 y 2
+    Retornar salida
 
-      mapa[i,j,f] <- SUM(region * filtro[f])
+BACKWARD(d_L_d_salida, learning_rate):
+    d_L_d_filtros ← zeros(forma de filtros)
 
-   Fin Para
+    Para cada (region, i, j) en OBTENER_REGIONES(última_entrada):
+        Para cada filtro f:
+            d_L_d_filtros[f] += region × d_L_d_salida[i, j, f]
 
-Fin Para
+    # Actualizar filtros — Descenso de Gradiente
+    filtros -= learning_rate × d_L_d_filtros
 
-
-2. Max Pooling
-
-Para cada región pooling hacer
-
-   salida_pool[i,j] <- máximo(región)
-
-Fin Para
-
-
-3. Softmax
-
-aplanar <- convertir salida_pool en vector
-
-z <- aplanar * pesos + biases
-
-probabilidades <- exp(z) / SUM(exp(z))
+    # Nota: propagación del error hacia atrás omitida (capa simple)
+    Retornar None
 
 
-4. Clasificación
+═══════════════════════════════════════
+ CLASE: CapaMaxPooling (tamaño_pool=2)
+═══════════════════════════════════════
 
-clase <- argmax(probabilidades)
+INICIALIZAR(tamaño_pool):
+    tamaño_pool ← tamaño_pool
 
-Salida:
- clase predicha
- probabilidades
+OBTENER_REGIONES(imagen):
+    h, w, num_filtros ← dimensiones de la imagen
+    nuevo_h ← h // tamaño_pool
+    nuevo_w ← w // tamaño_pool
+
+    Para i desde 0 hasta nuevo_h:
+        Para j desde 0 hasta nuevo_w:
+            region ← imagen[i×pool : (i+1)×pool,
+                            j×pool : (j+1)×pool]
+            Ceder (region, i, j)
+
+FORWARD(entrada):
+    ...  [reducir tomando el MÁXIMO de cada región pool×pool]
+
+BACKWARD(...):
+    ...  [propagar gradiente solo a la posición del máximo]
 
 COMPLEJIDAD EN TIEMPO:
   - Entrenamiento: O(capas · filtros · tamaño_imagen · kernel²)
