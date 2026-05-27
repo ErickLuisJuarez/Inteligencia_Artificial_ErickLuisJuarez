@@ -1,16 +1,15 @@
 ================================================================================
 INTELIGENCIA ARTIFICIAL – UNIDAD 5
-ALGORITMO: SIFT – Scale-Invariant Feature Transform (VISIÓN COMPUTACIONAL)
-Dra. Jessica Sarahi Méndez Rincón
+ALGORITMO: SIFT – SCALE-INVARIANT FEATURE TRANSFORM (VISIÓN COMPUTACIONAL)
+Basado en Dra. Jessica Sarahi Méndez Rincón
 ================================================================================
 
-
-────────────────────────────────────────────────────────────────────────────────
 1. FUNDAMENTOS MATEMÁTICOS
-────────────────────────────────────────────────────────────────────────────────
 
-SIFT detecta y describe puntos clave invariantes a escala, rotación
-e iluminación. Su pipeline matemático consta de cuatro etapas:
+SIFT detecta y describe puntos clave invariantes a escala, rotación e
+iluminación. Identifica características locales dentro de una imagen conocidas
+como puntos de interés que no se ven afectadas por el tamaño de la imagen o su
+orientación.
 
 ETAPA 1 – Espacio de escala (DoG, Difference of Gaussians):
   L(x, y, σ) = G(x, y, σ) * I(x, y)
@@ -18,14 +17,18 @@ ETAPA 1 – Espacio de escala (DoG, Difference of Gaussians):
 
   donde G es un kernel gaussiano de desviación σ,
   * denota convolución, y k es un factor de escala constante.
+  DoG aproxima el Laplaciano de Gaussiano (LoG) para detectar puntos de interés
+  en diferentes escalas.
 
 ETAPA 2 – Detección de extremos locales:
-  Un píxel es punto clave candidato si es máximo o mínimo local
-  comparado con sus 26 vecinos en espacio y escala (3 capas DoG).
+  Un píxel es punto clave candidato si es máximo o mínimo local comparado con
+  sus 26 vecinos en espacio y escala (3 capas DoG): los 8 vecinos en la misma
+  escala, más 9 de la escala superior y 9 de la escala inferior.
 
 ETAPA 3 – Asignación de orientación:
-  Para cada punto clave, se calcula el histograma de gradientes
-  en una vecindad 16×16 alrededor del punto.
+  Para cada punto clave, se calcula el histograma de gradientes en una vecindad
+  16×16 alrededor del punto. El histograma tiene 36 barras (10° cada una)
+  cubriendo 360°.
 
   Magnitud:    m(x,y) = √( (L(x+1,y)-L(x-1,y))² + (L(x,y+1)-L(x,y-1))² )
   Orientación: θ(x,y) = arctan( (L(x,y+1)-L(x,y-1)) / (L(x+1,y)-L(x-1,y)) )
@@ -35,36 +38,63 @@ ETAPA 4 – Descriptor de 128 dimensiones:
   Cada sub-región genera un histograma de 8 orientaciones.
   Total: 16 × 8 = 128 valores → vector descriptor normalizado (norma L2).
 
+2. ALGORITMO FORMAL
 
-────────────────────────────────────────────────────────────────────────────────
-2. DESCRIPCIÓN FORMAL / NARRATIVA
-────────────────────────────────────────────────────────────────────────────────
+Entrada: Imagen I en escala de grises.
+Salida: Conjunto de puntos clave K y descriptores D (matriz N×128).
 
-SIFT identifica puntos clave robustos en una imagen (esquinas, manchas,
-etc.) y genera para cada uno una "huella digital" vectorial de 128
-dimensiones que no cambia aunque la imagen sea rotada, escalada o tenga
-diferente iluminación.
+1. Construir pirámide gaussiana: L[o][s] = G(σ[o][s]) * I para cada octava o y escala s.
+2. Calcular Difference of Gaussians: D[o][s] = L[o][s+1] - L[o][s].
+3. Detectar extremos locales en D[o][s] comparando cada píxel con sus 26 vecinos.
+4. Refinar puntos clave usando expansión en series de Taylor del espacio de escalas.
+5. Filtrar puntos con bajo contraste (intensidad < umbral 0.03) y puntos sobre bordes.
+6. Para cada punto clave:
+     a. Calcular magnitud y orientación en vecindad.
+     b. Construir histograma de orientaciones (36 bins).
+     c. Asignar orientación(es) dominante(s).
+7. Para cada punto clave:
+     a. Extraer región 16×16 rotada según orientación dominante.
+     b. Dividir en 16 subregiones de 4×4.
+     c. Calcular histograma de 8 orientaciones por subregión.
+     d. Concatenar en vector de 128 dimensiones y normalizar.
+8. Retornar puntos clave y descriptores.
+
+3. DESCRIPCIÓN FORMAL / NARRATIVA
+
+SIFT identifica puntos clave robustos en una imagen (esquinas, manchas, etc.)
+y genera para cada uno una "huella digital" vectorial de 128 dimensiones que
+no cambia aunque la imagen sea rotada, escalada o tenga diferente iluminación.
 
 Pasos del proceso:
-  1. Construir pirámide gaussiana: aplicar sucesivamente filtros
-     gaussianos de distinta sigma a la imagen.
-  2. Calcular diferencias entre capas consecutivas (DoG) para
-     detectar estructuras estables a distintas escalas.
-  3. Buscar extremos locales (máximos y mínimos) en los mapas DoG
-     comparando cada píxel con sus 26 vecinos 3D.
-  4. Refinar y filtrar puntos candidatos (eliminar puntos con bajo
-     contraste o sobre bordes).
-  5. Asignar una orientación dominante a cada punto clave.
+  1. Construir pirámide gaussiana: aplicar sucesivamente filtros gaussianos
+     de distinta sigma a la imagen en diferentes octavas.
+  2. Calcular diferencias entre capas consecutivas (DoG) para detectar
+     estructuras estables a distintas escalas.
+  3. Buscar extremos locales (máximos y mínimos) en los mapas DoG comparando
+     cada píxel con sus 26 vecinos 3D.
+  4. Refinar y filtrar puntos candidatos (eliminar puntos con bajo contraste
+     o sobre bordes usando la matriz Hessiana).
+  5. Asignar una orientación dominante a cada punto clave mediante histograma
+     de gradientes (36 bins, 10° cada uno).
   6. Calcular el descriptor de 128 valores y normalizarlo.
 
-El resultado es una lista de puntos clave (coordenada + escala +
-orientación) y sus descriptores (matriz N×128), que pueden usarse
-para comparar o emparejar imágenes.
+El resultado es una lista de puntos clave (coordenada + escala + orientación)
+y sus descriptores (matriz N×128), que pueden usarse para comparar o emparejar
+imágenes, incluso bajo diferentes perspectivas y escalas.
 
+4. MÉTRICAS DE COMPLEJIDAD
 
-────────────────────────────────────────────────────────────────────────────────
-3. PSEUDOCÓDIGO
-────────────────────────────────────────────────────────────────────────────────
+Complejidad temporal: O(N), donde N es el número de píxeles, pero con una
+  constante muy alta debido a la construcción de la pirámide Gaussiana
+  (típicamente 4 octavas con 5 escalas cada una) y el cálculo de los 128
+  descriptores por punto clave. Es computacionalmente costoso en comparación
+  con operadores locales como Sobel.
+
+Complejidad espacial: O(N × S), donde S es el número de escalas (típicamente
+  20-30 imágenes en toda la pirámide), debido al almacenamiento de la pirámide
+  de imágenes y los mapas DoG.
+
+5. PSEUDOCÓDIGO
 
 FUNCIÓN extraer_caracteristicas_sift(imagen_uint8):
   // Validaciones
@@ -92,7 +122,7 @@ FUNCIÓN extraer_caracteristicas_sift(imagen_uint8):
   // ── ETAPA 3: Refinamiento y filtrado ────────────────────────
   puntos_clave ← []
   PARA cada (x, y, o, s) EN candidatos:
-      SI contraste < umbral:
+      SI contraste < umbral (0.03):
           CONTINUAR                  // descartar bajo contraste
       SI punto sobre borde (ratio de curvaturas > umbral):
           CONTINUAR                  // descartar bordes
@@ -124,7 +154,3 @@ imagen_uint8 ← img_as_ubyte(imagen_float)
 kp, des ← extraer_caracteristicas_sift(imagen_uint8)
 IMPRIMIR "Puntos clave:", longitud(kp)
 IMPRIMIR "Shape descriptores:", forma(des)   // (N, 128)
-
-================================================================================
-FIN DEL DOCUMENTO
-================================================================================
