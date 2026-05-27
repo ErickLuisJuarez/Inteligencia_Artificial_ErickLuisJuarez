@@ -1,23 +1,23 @@
 ================================================================================
 INTELIGENCIA ARTIFICIAL – UNIDAD 5
-ALGORITMO: DISTANCIA DE LEVENSHTEIN (PNL)
-Dra. Jessica Sarahi Méndez Rincón
+ALGORITMO: DISTANCIA DE LEVENSHTEIN (PROCESAMIENTO DE LENGUAJE NATURAL)
+Basado en Dra. Jessica Sarahi Méndez Rincón
 ================================================================================
 
-
-────────────────────────────────────────────────────────────────────────────────
 1. FUNDAMENTOS MATEMÁTICOS
-────────────────────────────────────────────────────────────────────────────────
 
-La distancia de Levenshtein entre dos cadenas a y b se define como:
+La distancia de Levenshtein entre dos cadenas a y b se define como el número
+mínimo de operaciones de edición (inserciones, eliminaciones o sustituciones de
+un solo carácter) necesarias para transformar una cadena en otra.
 
-  lev(a, b) = lev(|a|, |b|)
+Sea Σ un alfabeto finito. Dadas dos cadenas A = a₁, a₂, ..., aₙ y B = b₁, b₂, ..., bₘ
+sobre Σ donde |A| = n y |B| = m.
 
-donde la función se calcula recursivamente como:
+La función se calcula recursivamente como:
 
-         ┌ max(i, j)                                  si min(i, j) = 0
-lev(i,j) = ┤
-         └ min( lev(i-1, j) + 1,                     // eliminación
+         ⎧ max(i, j)                                  si min(i, j) = 0
+lev(i,j) = ⎨
+         ⎩ min( lev(i-1, j) + 1,                     // eliminación
                 lev(i, j-1) + 1,                     // inserción
                 lev(i-1, j-1) + costo )              // sustitución
 
@@ -25,56 +25,56 @@ con:
   costo = 0  si  a[i] = b[j]
   costo = 1  si  a[i] ≠ b[j]
 
-La solución óptima se obtiene mediante Programación Dinámica,
-construyendo una matriz M de dimensiones (|a|+1) × (|b|+1).
+2. ALGORITMO FORMAL (WAGNER-FISCHER)
 
-  Complejidad temporal: O(n × m)
-  Complejidad espacial: O(n × m)
-  donde n = |a|, m = |b|.
+Entrada: Dos cadenas A y B de longitudes n y m.
+Salida: Distancia de Levenshtein L(A, B).
 
+1. Inicializar matriz M de dimensiones (n+1) × (m+1).
+2. Para i desde 0 hasta n: M[i][0] ← i
+3. Para j desde 0 hasta m: M[0][j] ← j
+4. Para i desde 1 hasta n:
+     Para j desde 1 hasta m:
+       Si A[i] = B[j] entonces costo ← 0
+       Si A[i] ≠ B[j] entonces costo ← 1
+       M[i][j] ← min( M[i-1][j] + 1, M[i][j-1] + 1, M[i-1][j-1] + costo )
+5. Retornar M[n][m]
 
-────────────────────────────────────────────────────────────────────────────────
-2. DESCRIPCIÓN FORMAL / NARRATIVA
-────────────────────────────────────────────────────────────────────────────────
+3. DESCRIPCIÓN FORMAL / NARRATIVA
 
 La distancia de Levenshtein mide cuántas operaciones mínimas de edición
 (inserción, eliminación o sustitución de un carácter) se necesitan para
-transformar una cadena en otra.
+transformar una cadena en otra. Es fundamental para corrección ortográfica,
+búsqueda difusa (fuzzy matching) y detección de errores OCR.
 
-Ejemplo del código: transformar "Gool" → "Gol"
-  - "Gool" tiene 4 caracteres, "Gol" tiene 3.
-  - Solo se necesita 1 operación: eliminar una 'o'.
-  - Por tanto lev("Gool", "Gol") = 1.
-
-El algoritmo construye una tabla donde cada celda M[i][j] almacena
-el costo mínimo de transformar los primeros i caracteres de a en los
-primeros j caracteres de b.
+La solución óptima se obtiene mediante Programación Dinámica, construyendo
+una matriz M de dimensiones (|a|+1) × (|b|+1). Cada celda M[i][j] almacena
+el costo mínimo de transformar los primeros i caracteres de a en los primeros
+j caracteres de b.
 
 Casos base:
-  - M[i][0] = i  → transformar i caracteres a cadena vacía = i eliminaciones
-  - M[0][j] = j  → transformar cadena vacía a j caracteres = j inserciones
+  - M[i][0] = i → transformar i caracteres a cadena vacía = i eliminaciones
+  - M[0][j] = j → transformar cadena vacía a j caracteres = j inserciones
 
-Llenado: para cada par (i,j) se elige el mínimo entre las tres operaciones.
+4. MÉTRICAS DE COMPLEJIDAD
 
+Complejidad temporal: O(n × m), donde n = |a|, m = |b|.
+Complejidad espacial: O(n × m) para almacenar la matriz completa.
+Es posible optimizar el espacio a O(min(n, m)) usando solo dos filas.
 
-────────────────────────────────────────────────────────────────────────────────
-3. PSEUDOCÓDIGO
-────────────────────────────────────────────────────────────────────────────────
+5. PSEUDOCÓDIGO
 
 FUNCIÓN levenshtein(a, b):
   n ← longitud(a)
   m ← longitud(b)
 
-  // Crear matriz (n+1) × (m+1) inicializada en 0
-  CREAR matriz M[0..n][0..m]
+  CREAR matriz M[0..n][0..m] inicializada en 0
 
-  // Casos base
   PARA i DESDE 0 HASTA n:
       M[i][0] ← i
   PARA j DESDE 0 HASTA m:
       M[0][j] ← j
 
-  // Programación dinámica
   PARA i DESDE 1 HASTA n:
       PARA j DESDE 1 HASTA m:
           SI a[i-1] = b[j-1]:
@@ -82,18 +82,11 @@ FUNCIÓN levenshtein(a, b):
           SINO:
               costo ← 1
 
-          M[i][j] ← MIN(
-              M[i-1][j]   + 1,       // eliminación
-              M[i][j-1]   + 1,       // inserción
-              M[i-1][j-1] + costo    // sustitución
-          )
+          M[i][j] ← MIN( M[i-1][j] + 1,    // eliminación
+                         M[i][j-1] + 1,    // inserción
+                         M[i-1][j-1] + costo ) // sustitución
 
   RETORNAR M[n][m]
 
 // Ejemplo de uso:
-distancia ← levenshtein("Gool", "Gol")
-IMPRIMIR distancia   // Resultado esperado: 1
-
-================================================================================
-FIN DEL DOCUMENTO
-================================================================================
+distancia ← levenshtein("Gool", "Gol")   // Resultado esperado: 1
