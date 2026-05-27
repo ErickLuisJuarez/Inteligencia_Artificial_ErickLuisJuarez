@@ -1,16 +1,14 @@
 ================================================================================
 INTELIGENCIA ARTIFICIAL – UNIDAD 5
 ALGORITMO: FILTRO DE SOBEL (VISIÓN COMPUTACIONAL)
-Dra. Jessica Sarahi Méndez Rincón
+Basado en Dra. Jessica Sarahi Méndez Rincón
 ================================================================================
 
-
-────────────────────────────────────────────────────────────────────────────────
 1. FUNDAMENTOS MATEMÁTICOS
-────────────────────────────────────────────────────────────────────────────────
 
-El operador de Sobel aproxima el gradiente de intensidad de una imagen
-en escala de grises mediante dos kernels de convolución 3×3.
+El operador de Sobel aproxima el gradiente de intensidad de una imagen en
+escala de grises mediante dos kernels de convolución 3×3. Detecta bordes
+midiendo cuán bruscamente cambia la intensidad de los píxeles en sus vecindades.
 
 Kernels:
        [-1  0  1]              [ 1  2  1]
@@ -21,8 +19,8 @@ Kernels:
   Gy detecta cambios verticales de intensidad (bordes horizontales).
 
 Convolución para cada píxel (i, j):
-  Gx(i,j) = Σ_{u,v} I(i+u, j+v) · Kx(u,v)
-  Gy(i,j) = Σ_{u,v} I(i+u, j+v) · Ky(u,v)
+  Gx(i,j) = Σ_{u=-1}^{1} Σ_{v=-1}^{1} I(i+u, j+v) · Kx(u+1, v+1)
+  Gy(i,j) = Σ_{u=-1}^{1} Σ_{v=-1}^{1} I(i+u, j+v) · Ky(u+1, v+1)
 
 Magnitud del gradiente (norma euclidiana):
   G(i,j) = √( Gx(i,j)² + Gy(i,j)² )
@@ -33,16 +31,23 @@ Dirección del gradiente (opcional):
 Normalización al rango [0, 255]:
   G_norm = (G / max(G)) × 255
 
+2. ALGORITMO FORMAL
 
-────────────────────────────────────────────────────────────────────────────────
-2. DESCRIPCIÓN FORMAL / NARRATIVA
-────────────────────────────────────────────────────────────────────────────────
+Entrada: Imagen I en escala de grises de dimensiones M × N.
+Salida: Imagen de bordes E de dimensiones M × N.
 
-El filtro de Sobel detecta bordes en una imagen midiendo cuán
-bruscamente cambia la intensidad de los píxeles en sus vecindades.
+Para cada píxel (i, j) en I:
+  1. Extraer ventana 3×3 centrada en (i, j) (usando padding de ceros en bordes)
+  2. Calcular Gx(i,j) = Σ_{a=0}^{2} Σ_{b=0}^{2} ventana[a][b] · Gx_kernel[a][b]
+  3. Calcular Gy(i,j) = Σ_{a=0}^{2} Σ_{b=0}^{2} ventana[a][b] · Gy_kernel[a][b]
+  4. E(i,j) = √( Gx(i,j)² + Gy(i,j)² )
+  5. Si E(i,j) > umbral, marcar como borde
 
-Un borde se produce donde hay un cambio fuerte de intensidad, lo que
-matemáticamente equivale a un gradiente grande.
+3. DESCRIPCIÓN FORMAL / NARRATIVA
+
+El filtro de Sobel detecta bordes en una imagen donde hay un cambio fuerte de
+intensidad, lo que matemáticamente equivale a un gradiente grande. Es uno de
+los primeros pasos en muchos sistemas de visión computacional.
 
 Pasos del proceso:
   1. Recibir imagen en escala de grises de al menos 3×3 píxeles.
@@ -52,13 +57,18 @@ Pasos del proceso:
   5. Calcular la magnitud euclidiana del gradiente resultante.
   6. Normalizar la imagen de salida al rango [0, 255].
 
-Resultado: imagen de bordes donde píxeles brillantes indican bordes
-fuertes y píxeles oscuros indican zonas uniformes.
+Resultado: imagen de bordes donde píxeles brillantes indican bordes fuertes y
+píxeles oscuros indican zonas uniformes.
 
+4. MÉTRICAS DE COMPLEJIDAD
 
-────────────────────────────────────────────────────────────────────────────────
-3. PSEUDOCÓDIGO
-────────────────────────────────────────────────────────────────────────────────
+Complejidad temporal: O(M × N), donde M y N son las dimensiones de la imagen.
+  Por cada píxel, se realizan 9 multiplicaciones y sumas por kernel (constante).
+
+Complejidad espacial: O(M × N) para almacenar la imagen de salida y las
+  derivadas parciales Gx y Gy (opcional).
+
+5. PSEUDOCÓDIGO
 
 FUNCIÓN sobel_filter(imagen):
   // Validaciones
@@ -82,20 +92,14 @@ FUNCIÓN sobel_filter(imagen):
       PARA j DESDE 0 HASTA cols-1:
           region ← imagen_pad[i:i+3, j:j+3]   // ventana 3×3
 
-          gx ← suma( region * Gx )             // suma de Hadamard con Gx
-          gy ← suma( region * Gy )             // suma de Hadamard con Gy
+          gx ← suma( region * Gx )            // suma de Hadamard con Gx
+          gy ← suma( region * Gy )            // suma de Hadamard con Gy
 
           salida[i][j] ← sqrt(gx² + gy²)      // magnitud del gradiente
 
   // Normalizar al rango [0, 255]
   salida ← (salida / max(salida)) * 255
-
   RETORNAR salida como uint8
 
 // Ejemplo de uso:
 bordes ← sobel_filter(imagen_gris)
-IMPRIMIR forma(bordes)   // mismo shape que imagen de entrada
-
-================================================================================
-FIN DEL DOCUMENTO
-================================================================================
